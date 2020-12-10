@@ -3,8 +3,7 @@ import Router from './router';
 
 const API_V1_URL = 'https://api.weatherlink.com/v1';
 const API_V2_URL = 'https://api.weatherlink.com/v2';
-const API_V2_KEY = API_V2_KEY;
-const API_V2_SECRET = API_V2_SECRET;
+const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5';
 const STATION_ID = '33062';
 
 let parameters = new Map();
@@ -34,6 +33,7 @@ async function handleRequest(request) {
   router.get('/', () => getCurrentWeather());
   router.get('/historic', () => getHistoricWeather());
   router.get('/station-data', () => getWeatherStationData());
+  router.get('/forecast', () => getForecast());
 
   const response = await router.route(request);
   return response;
@@ -97,7 +97,18 @@ async function getHistoricWeather() {
 }
 
 async function getForecast() {
-  
+  const finalUrl = `${OPEN_WEATHER_API_URL}/onecall?` +
+    'lat=' + 42.84655 +
+    '&lon=' + -88.74374 +
+    '&exclude=' + 'hourly' +
+    '&appid=' + OPEN_WEATHER_API_KEY;
+
+  // Make the Open Weather Map API call
+  const response = await fetch(finalUrl, requestInit);
+  // Get the response body
+  const results = await gatherResponse(response);
+  // Return the response from the Open Weather Maps API
+  return new Response(results, responseInit);
 }
 
 async function gatherResponse(response) {
